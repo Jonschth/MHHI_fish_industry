@@ -1,0 +1,113 @@
+---
+title: "directorate_of_fisheries"
+author: "jst"
+date: "8 janúar 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(dplyr)
+
+library(rstatix)
+library(FSA)
+
+library(conover.test)
+library(poweRlaw)
+
+```
+
+
+
+```{r}
+bot_jul_des <- 
+  read_excel("botnvarpa_jul_des_2021.xlsx", 
+                          sheet = "5_flokkar")
+bot_jul_des_piv <-
+  bot_jul_des %>% 
+  pivot_longer(c(vika_1, vika_2,vika_3,vika_4,vika_5), 
+              names_to = "vika", 
+              values_to = "fjoldi") %>% 
+  arrange(vika)
+   
+bot_jul_des_piv<-bot_jul_des_piv %>% 
+  drop_na()                 
+
+bot_jul_des_piv %>% 
+ggplot( aes(x = reorder(vika,
+                        fjoldi,FUN=median), 
+                        y = fjoldi, 
+                        col = vika)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(width = 0.1) + 
+  theme(legend.position="middle")+
+  coord_flip()
+
+
+
+```
+
+
+
+```{r}
+
+x1<-  bot_jul_des$vika_1 
+new.x1<-x1[!is.na(x1)]
+
+x2<-  bot_jul_des$vika_2
+new.x2<-x2[!is.na(x2)]
+
+x3<-  bot_jul_des$vika_3
+new.x3<-x3[!is.na(x3)]
+
+x4<-  bot_jul_des$vika_4 
+new.x4<-x4[!is.na(x4)]
+
+x5<-  bot_jul_des$vika_5 
+new.x5<-x5[!is.na(x5)]
+
+
+x <-c(new.x1,new.x2,new.x3,new.x4,new.x5)
+
+length(new.x5)
+
+g <- factor(rep(1:5, c(12,15, 14,10,10)),
+            labels = c("vika1",
+                       "vika2",
+                       "vika3",
+                       "vika4",
+                       "vika5"))
+
+
+
+conover.test(x,g, method = "bh")
+
+
+
+
+bot_jul_des_piv%>% 
+  drop_na() %>% 
+  dunn_test(fjoldi~vika,p.adjust.method = "bonferroni") 
+
+
+bot_jul_des_piv %>% 
+  drop_na() %>% 
+  wilcox_test(fjoldi~vika, p.adjust.method = "bonferroni")
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+

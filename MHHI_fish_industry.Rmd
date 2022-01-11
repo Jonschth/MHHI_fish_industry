@@ -1,0 +1,28 @@
+---
+title: "MHHI_fish_industry"
+author: "jst"
+date: "8 janúar 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(readxl)
+Y_f <- read_excel("Yfirlit_fiskveidiarid_2122.xlsx", 
+    sheet = "Aflamark_fyrirtaki_2021-2122", 
+    skip = 6)
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
