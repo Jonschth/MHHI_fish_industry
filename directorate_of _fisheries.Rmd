@@ -85,16 +85,15 @@ g <- factor(rep(1:5, c(12,15, 14,10,10)),
 
 
 
+#Conover próf
 conover.test(x,g, method = "bh")
 
-
-
-
+#Dunn próf
 bot_jul_des_piv%>% 
   drop_na() %>% 
   dunn_test(fjoldi~vika,p.adjust.method = "bonferroni") 
 
-
+#Wilcox próf
 bot_jul_des_piv %>% 
   drop_na() %>% 
   wilcox_test(fjoldi~vika, p.adjust.method = "bonferroni")
@@ -103,10 +102,30 @@ bot_jul_des_piv %>%
 ```
 
 ```{r}
+#powerlaw distribution
+m_pl = displ$new(bot_jul_des_piv$fjoldi)
+est=estimate_xmin(m_pl)
+m_pl$setXmin(est)
+
+estimate_xmin(m_pl,pars=new.x1)
+
+#log normal distribution
+m_ln =dislnorm$new(bot_jul_des_piv$fjoldi)
+est=estimate_xmin(m_ln)
+m_ln$setXmin(est)
+
+#poisson distribution
+m_pois =dispois$new(bot_jul_des_piv$fjoldi)
+est=estimate_xmin(m_pois)
+m_pois$setXmin(est)
 
 
 
 
+plot(m_pl)
+lines(m_pl, col=2)
+lines(m_ln, col=3)
+lines(m_pois,col=4)
 
 ```
 
