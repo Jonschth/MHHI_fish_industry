@@ -20,6 +20,9 @@ library(FSA)
 library(conover.test)
 library(poweRlaw)
 
+
+library(ecolTest)
+
 ```
 
 
@@ -84,6 +87,7 @@ g <- factor(rep(1:5, c(12,15, 14,10,10)),
                        "vika5"))
 
 
+kruskal.test(x,g)
 
 #Conover próf
 conover.test(x,g, method = "bh")
@@ -107,7 +111,6 @@ m_pl = displ$new(bot_jul_des_piv$fjoldi)
 est=estimate_xmin(m_pl)
 m_pl$setXmin(est)
 
-estimate_xmin(m_pl,pars=new.x1)
 
 #log normal distribution
 m_ln =dislnorm$new(bot_jul_des_piv$fjoldi)
@@ -120,13 +123,92 @@ est=estimate_xmin(m_pois)
 m_pois$setXmin(est)
 
 
-
-
-plot(m_pl)
+plot(m_pl1)
 lines(m_pl, col=2)
 lines(m_ln, col=3)
 lines(m_pois,col=4)
 
+m_pl1 = displ$new(new.x3)
+est=estimate_xmin(m_pl1)
+m_pl1$setXmin(est)
+
+
+
+bs_p = bootstrap_p(m_pl)
+
+bs_p
+
+plot(bs_p)
+
+```
+```{r}
+library(diverse)
+
+library(pheatmap)
+View(scidat)
+scidat
+
+colfunc <- colorRampPalette(c("deepskyblue4", "deepskyblue", "cyan"))
+
+
+plot_mat <- function(data){
+pheatmap(data, colfunc(5), cluster_rows = FALSE, cluster_cols = FALSE)
+}
+
+bot_jul_des <- 
+  read_excel("botnvarpa_jul_des_2021.xlsx", 
+                          sheet = "Sheet1")
+
+hringur <-   read_excel("botnvarpa_jul_des_2021.xlsx", 
+                          sheet = "Sheet2")
+
+bot_jul_des <-hringur %>% remove_rownames %>% column_to_rownames(var="names")
+
+
+df1 <- data.matrix(bot_jul_des[,1:5])
+rownames(df1) <- rownames(bot_jul_des)
+
+df2 <- data.matrix(bot_jul_des[,1:5])
+rownames(df2) <- rownames(bot_jul_des)
+
+colfunc <- colorRampPalette(c("deepskyblue4", "deepskyblue", "cyan"))
+
+
+pheatmap(values(tail(df2,20),norm='p'),colfunc(10), cluster_rows = FALSE, cluster_cols = FALSE)
+
+
+ubiquity(data=df2)
+round(diversity(data = df2, type = c('hhi', 'gs', 'b','ev')), 3)
+round(dis_entities(df2, method = 'cosine'), 2)
+
+```
+
+```{r}
+
+
+scale_rows = function(x){
+    m = apply(x, 1, mean, na.rm = T)
+    s = apply(x, 1, sd, na.rm = T)
+    return((x - m) / s)
+}
+
+scale_rows(df2)
+
+
+
+
+Hutcheson_t_test(
+  df2[,1],
+  df2[,2],
+  shannon.base = exp(1),
+  alternative = "two.sided",
+  difference = 0
+)
+
+
+
+
+multiple_Hutcheson_t_test(df2,  shannon.base = exp(1))
 ```
 
 
