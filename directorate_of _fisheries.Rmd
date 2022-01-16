@@ -194,7 +194,7 @@ scale_rows = function(x){
 
 scale_rows(df2)
 
-
+View(df2)
 
 
 Hutcheson_t_test(
