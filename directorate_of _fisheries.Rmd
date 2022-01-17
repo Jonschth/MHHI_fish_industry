@@ -163,23 +163,32 @@ hringur <-   read_excel("botnvarpa_jul_des_2021.xlsx",
                           sheet = "Sheet2")
 
 bot_jul_des <-hringur %>% remove_rownames %>% column_to_rownames(var="names")
+bot_jul_des[is.na(bot_jul_des)] <- 0
 
 
-df1 <- data.matrix(bot_jul_des[,1:5])
-rownames(df1) <- rownames(bot_jul_des)
+
 
 df2 <- data.matrix(bot_jul_des[,1:5])
 rownames(df2) <- rownames(bot_jul_des)
 
+View(df2)
 colfunc <- colorRampPalette(c("deepskyblue4", "deepskyblue", "cyan"))
 
 
-pheatmap(values(tail(df2,20),norm='p'),colfunc(10), cluster_rows = FALSE, cluster_cols = FALSE)
+pheatmap(values(tail(df2,20),norm='rac', filter=1),colfunc(10), cluster_rows = FALSE, cluster_cols = FALSE)
 
 
 ubiquity(data=df2)
 round(diversity(data = df2, type = c('hhi', 'gs', 'b','ev')), 3)
 round(dis_entities(df2, method = 'cosine'), 2)
+variety(df2)
+
+bal <- balance(df2, category_row = TRUE) #note the function balance
+barplot(t(bal), legend = FALSE, ylab = "Proportions",
+col=c("darkblue","blue","sky blue", "light blue") )
+
+
+
 
 ```
 
@@ -192,23 +201,31 @@ scale_rows = function(x){
     return((x - m) / s)
 }
 
-scale_rows(df2)
+df2 <-apply(df2, MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))*2)
 
 View(df2)
 
 
 Hutcheson_t_test(
+  df2[,3],
   df2[,1],
-  df2[,2],
   shannon.base = exp(1),
   alternative = "two.sided",
   difference = 0
 )
 
+df2
 
 
 
-multiple_Hutcheson_t_test(df2,  shannon.base = exp(1))
+multiple_Hutcheson_t_test(df2,  shannon.base = 2)
+
+
+# one-sided test
+Hutcheson_t_test(x=polychaeta_abundance$Sample.1,
+y=polychaeta_abundance$Sample.2,
+shannon.base = 2,
+alternative = "greater")
 ```
 
 
