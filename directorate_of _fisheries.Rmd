@@ -160,7 +160,7 @@ bot_jul_des <-
                           sheet = "Sheet1")
 
 hringur <-   read_excel("botnvarpa_jul_des_2021.xlsx", 
-                          sheet = "Sheet2")
+                          sheet = "Sheet1")
 
 bot_jul_des <-hringur %>% remove_rownames %>% column_to_rownames(var="names")
 bot_jul_des[is.na(bot_jul_des)] <- 0
@@ -179,7 +179,7 @@ pheatmap(values(tail(df2,20),norm='rac', filter=1),colfunc(10), cluster_rows = F
 
 
 ubiquity(data=df2)
-round(diversity(data = df2, type = c('hhi', 'gs', 'b','ev')), 3)
+round(diversity(data = df2, type = c('hhi', 'gs', 'b','ev','s','e')), 3)
 round(dis_entities(df2, method = 'cosine'), 2)
 variety(df2)
 
@@ -201,14 +201,14 @@ scale_rows = function(x){
     return((x - m) / s)
 }
 
-df2 <-apply(df2, MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))*2)
+df2 <-apply(df2, MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))*1)
 
 View(df2)
 
 
 Hutcheson_t_test(
-  df2[,3],
   df2[,1],
+  df2[,3],
   shannon.base = exp(1),
   alternative = "two.sided",
   difference = 0
