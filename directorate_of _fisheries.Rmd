@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readxl)
 library(tidyverse)
 library(dplyr)
+library (ggplot2)
 
 library(rstatix)
 library(FSA)
@@ -20,6 +21,10 @@ library(FSA)
 library(conover.test)
 library(poweRlaw)
 
+
+library(diverse)
+
+library(pheatmap)
 
 library(ecolTest)
 
@@ -142,11 +147,8 @@ plot(bs_p)
 
 ```
 ```{r}
-library(diverse)
 
-library(pheatmap)
-View(scidat)
-scidat
+
 
 colfunc <- colorRampPalette(c("deepskyblue4", "deepskyblue", "cyan"))
 
@@ -155,41 +157,42 @@ plot_mat <- function(data){
 pheatmap(data, colfunc(5), cluster_rows = FALSE, cluster_cols = FALSE)
 }
 
-bot_jul_des <- 
-  read_excel("botnvarpa_jul_des_2021.xlsx", 
-                          sheet = "Sheet1")
+
 
 hringur <-   read_excel("botnvarpa_jul_des_2021.xlsx", 
-                          sheet = "Sheet1")
+                          sheet = "Hringur")
 
 bot_jul_des <-hringur %>% remove_rownames %>% column_to_rownames(var="names")
 bot_jul_des[is.na(bot_jul_des)] <- 0
-
-
-
-
 df2 <- data.matrix(bot_jul_des[,1:5])
 rownames(df2) <- rownames(bot_jul_des)
+df_rca_fil <- values(t(df2[1:19,]), norm = 'rca', filter = 1)
 
 View(df2)
 colfunc <- colorRampPalette(c("deepskyblue4", "deepskyblue", "cyan"))
 
 
-pheatmap(values(tail(df2,20),norm='rac', filter=1),colfunc(10), cluster_rows = FALSE, cluster_cols = FALSE)
+pheatmap(values(tail(df1,15),norm='rac', filter=1),colfunc(10), cluster_rows = FALSE, cluster_cols = FALSE)
 
 
 ubiquity(data=df2)
-round(diversity(data = df2, type = c('hhi', 'gs', 'b','ev','s','e')), 3)
-round(dis_entities(df2, method = 'cosine'), 2)
-variety(df2)
+round(diversity(data = t(df2[1:18,]), type = c('gs','ev','s','e','rao')), 2)
+round(dis_entities(t(df2), method = 'cosine'), 2)
+variety(t(df2))
 
-bal <- balance(df2, category_row = TRUE) #note the function balance
-barplot(t(bal), legend = FALSE, ylab = "Proportions",
+
+bal <- balance(t(df2), category_row = TRUE) #note the function balance
+barplot(t(bal), legend = FALSE, ylab = "Proportions",las=2,
 col=c("darkblue","blue","sky blue", "light blue") )
 
 
+disparity(df_rca_fil)
+diversity(data = df_rca_fil, type = c('rao','rs') ,
+alpha=0.7, beta = 0.3, method ='cosine')
 
 
+
+  
 ```
 
 ```{r}
@@ -207,25 +210,23 @@ View(df2)
 
 
 Hutcheson_t_test(
-  df2[,1],
-  df2[,3],
+  df2[8:18,3],
+  df2[8:18,1],
   shannon.base = exp(1),
-  alternative = "two.sided",
+  alternative = "greater",
   difference = 0
 )
 
+
+
+df2[6:18,1]
 df2
 
 
 
-multiple_Hutcheson_t_test(df2,  shannon.base = 2)
+multiple_Hutcheson_t_test(df2[6:18,],  shannon.base = exp(1))
 
 
-# one-sided test
-Hutcheson_t_test(x=polychaeta_abundance$Sample.1,
-y=polychaeta_abundance$Sample.2,
-shannon.base = 2,
-alternative = "greater")
 ```
 
 
